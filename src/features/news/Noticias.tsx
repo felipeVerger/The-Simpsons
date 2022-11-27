@@ -1,13 +1,8 @@
 import { useEffect, useState } from "react";
-import { SuscribeImage, CloseButton as Close } from "../../assets";
+
 import { obtenerNoticias } from "./fakeRest";
+import Modal from "./Modal";
 import {
-  CloseButton,
-  TarjetaModal,
-  ContenedorModal,
-  DescripcionModal,
-  ImagenModal,
-  TituloModal,
   TarjetaNoticia,
   FechaTarjetaNoticia,
   DescripcionTarjetaNoticia,
@@ -17,8 +12,6 @@ import {
   ListaNoticias,
   TituloNoticias,
   BotonLectura,
-  BotonSuscribir,
-  CotenedorTexto,
 } from "./styled";
 
 export interface INoticiasNormalizadas {
@@ -35,31 +28,45 @@ const Noticias = () => {
   const [noticias, setNoticias] = useState<INoticiasNormalizadas[]>([]);
   const [modal, setModal] = useState<INoticiasNormalizadas | null>(null);
 
+  /**
+   * It takes a string and returns a string with the first letter of each word capitalized.
+   * @param {string} title - string - This is the title that we want to capitalize.
+   * @returns A function that takes a string and returns a string.
+   */
+  const capitalize = (title: string): string => {
+    return title.split(' ').map((string) => string.charAt(0).toUpperCase() + string.slice(1)).join(" ");
+  }
+
+  /**
+   * Get the time difference between the current time and the time of the news article, and return the
+   * difference in minutes.
+   * @param {Date} fechaNoticia - Date =&gt; The date of the news
+   * @returns The number of minutes between the current time and the time of the news.
+   */
+  const getTime = (fechaNoticia: Date): number => {
+    const time = new Date();
+    const minutosTranscurridos = Math.floor(
+      (time.getTime() - fechaNoticia.getTime()) / 60000
+    );
+      return minutosTranscurridos;
+  }
+
   useEffect(() => {
     const obtenerInformacion = async () => {
       const respuesta = await obtenerNoticias();
 
-      const data = respuesta.map((n) => {
-        const titulo = n.titulo
-          .split(" ")
-          .map((str) => {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-          })
-          .join(" ");
-
-        const ahora = new Date();
-        const minutosTranscurridos = Math.floor(
-          (ahora.getTime() - n.fecha.getTime()) / 60000
-        );
+      const data = respuesta.map((noticia) => {        
+        const titulo = capitalize(noticia.titulo);
+        const minutosTranscurridos = getTime(noticia.fecha)
 
         return {
-          id: n.id,
+          id: noticia.id,
           titulo,
-          descripcion: n.descripcion,
+          descripcion: noticia.descripcion,
           fecha: `Hace ${minutosTranscurridos} minutos`,
-          esPremium: n.esPremium,
-          imagen: n.imagen,
-          descripcionCorta: n.descripcion.substring(0, 100),
+          esPremium: noticia.esPremium,
+          imagen: noticia.imagen,
+          descripcionCorta: noticia.descripcion.substring(0, 100),
         };
       });
 
@@ -69,63 +76,23 @@ const Noticias = () => {
     obtenerInformacion();
   }, []);
 
+  
   return (
     <ContenedorNoticias>
       <TituloNoticias>Noticias de los Simpsons</TituloNoticias>
       <ListaNoticias>
-        {noticias.map((n) => (
-          <TarjetaNoticia>
-            <ImagenTarjetaNoticia src={n.imagen} />
-            <TituloTarjetaNoticia>{n.titulo}</TituloTarjetaNoticia>
-            <FechaTarjetaNoticia>{n.fecha}</FechaTarjetaNoticia>
+        {noticias.map((noticia) => (
+          <TarjetaNoticia key={noticia.id}>
+            <ImagenTarjetaNoticia src={noticia.imagen} />
+            <TituloTarjetaNoticia>{noticia.titulo}</TituloTarjetaNoticia>
+            <FechaTarjetaNoticia>{noticia.fecha}</FechaTarjetaNoticia>
             <DescripcionTarjetaNoticia>
-              {n.descripcionCorta}
+              {noticia.descripcionCorta}
             </DescripcionTarjetaNoticia>
-            <BotonLectura onClick={() => setModal(n)}>Ver más</BotonLectura>
+            <BotonLectura onClick={() => setModal(noticia)}>Ver más</BotonLectura>
           </TarjetaNoticia>
         ))}
-        {modal ? (
-          modal.esPremium ? (
-            <ContenedorModal>
-              <TarjetaModal>
-                <CloseButton onClick={() => setModal(null)}>
-                  <img src={Close} alt="close-button" />
-                </CloseButton>
-                <ImagenModal src={SuscribeImage} alt="mr-burns-excelent" />
-                <CotenedorTexto>
-                  <TituloModal>Suscríbete a nuestro Newsletter</TituloModal>
-                  <DescripcionModal>
-                    Suscríbete a nuestro newsletter y recibe noticias de
-                    nuestros personajes favoritos.
-                  </DescripcionModal>
-                  <BotonSuscribir
-                    onClick={() =>
-                      setTimeout(() => {
-                        alert("Suscripto!");
-                        setModal(null);
-                      }, 1000)
-                    }
-                  >
-                    Suscríbete
-                  </BotonSuscribir>
-                </CotenedorTexto>
-              </TarjetaModal>
-            </ContenedorModal>
-          ) : (
-            <ContenedorModal>
-              <TarjetaModal>
-                <CloseButton onClick={() => setModal(null)}>
-                  <img src={Close} alt="close-button" />
-                </CloseButton>
-                <ImagenModal src={modal.imagen} alt="news-image" />
-                <CotenedorTexto>
-                  <TituloModal>{modal.titulo}</TituloModal>
-                  <DescripcionModal>{modal.descripcion}</DescripcionModal>
-                </CotenedorTexto>
-              </TarjetaModal>
-            </ContenedorModal>
-          )
-        ) : null}
+        <Modal setModal={setModal} modal={modal}/>
       </ListaNoticias>
     </ContenedorNoticias>
   );
