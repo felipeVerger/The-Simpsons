@@ -12,7 +12,7 @@ import { obtenerMensaje } from "./utils";
 
 function Cita() {
   const [valorInput, setValorInput] = useState("");
-  const { cita = "", personaje = "" } = useAppSelector(obtenerCitaDelEstado, shallowEqual) || {};
+  const { cita = "", personaje = "", imagen = "" } = useAppSelector(obtenerCitaDelEstado, shallowEqual) || {};
   const estadoPedido = useAppSelector(obtenerEstadoDelPedido);
 
   const dispatch = useAppDispatch();
@@ -27,7 +27,7 @@ function Cita() {
   return (
     <ContenedorCita>
       <TextoCita>{obtenerMensaje(cita, estadoPedido)}</TextoCita>
-      <AutorCita>{personaje}</AutorCita>
+      <AutorCita data-testid="character-name">{personaje}</AutorCita>
       <Input
         aria-label="Author Cita"
         value={valorInput}
@@ -37,6 +37,7 @@ function Cita() {
       <Boton
         aria-label={valorInput ? "Obtener Cita" : "Obtener cita aleatoria"}
         onClick={onClickObtenerCita}
+        test-id="button"
       >
         {valorInput ? "Obtener Cita" : "Obtener cita aleatoria"}
       </Boton>

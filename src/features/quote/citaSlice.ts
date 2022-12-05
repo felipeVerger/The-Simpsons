@@ -14,12 +14,9 @@ const initialState: EstadoCita = {
   estado: ESTADO_FETCH.INACTIVO,
 };
 
-export const obtenerCitaAsync = createAsyncThunk(
-  "cita/obtenerCita",
-  async (personaje: string) => {
+export const obtenerCitaAsync = createAsyncThunk("cita/obtenerCita", async (personaje?: string) => {
     try {
       const cita = await obtenerCita(personaje);
-
       return cita;
     } catch (err) {
       throw err;
