@@ -12,7 +12,7 @@ import { obtenerMensaje } from "./utils";
 
 function Cita() {
   const [valorInput, setValorInput] = useState("");
-  const { cita = "", personaje = "", imagen = "" } = useAppSelector(obtenerCitaDelEstado, shallowEqual) || {};
+  const { cita = "", personaje = ""} = useAppSelector(obtenerCitaDelEstado, shallowEqual) || {};
   const estadoPedido = useAppSelector(obtenerEstadoDelPedido);
 
   const dispatch = useAppDispatch();
