@@ -1,7 +1,7 @@
 import React from 'react'
 import {ContenedorModal, TarjetaModal, CloseButton, ImagenModal, CotenedorTexto, TituloModal, DescripcionModal, BotonSuscribir} from './styled';
 import { SuscribeImage, CloseButton as Close } from "../../assets";
-import { INoticiasNormalizadas } from './Noticias';
+import { INoticiasNormalizadas } from '../../hooks/useFetch';
 
 interface IProps {
     setModal: (props: INoticiasNormalizadas | null) => void;
